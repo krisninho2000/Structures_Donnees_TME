@@ -1,0 +1,6 @@
+plot "01_matrice_vitesse.txt" using 1:2 with lines
+replot "02_matrice_vitesse.txt" using 1:3 with lines
+set term postscript portrait
+set output "courbes_matrices_vitesse.ps"
+set size 0.7, 0.7
+replot

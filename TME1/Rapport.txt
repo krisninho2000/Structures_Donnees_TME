@@ -1,0 +1,32 @@
+Rapport du TME1 de Structures de données :
+
+Exercice 2 :
+
+1) Voir le fichier exo2.c, les fonctions :
+- int* alloue_tableau(int n)
+- void remplir_tableau(int* tab, int n, int V)
+- void afficher_tab(int* tab, int n)
+
+2) Voir le fichier exo2.c, les fonctions : 
+- int somme_diff_carres_v1(int *tab, int n)
+- int somme_diff_carres_v2(int *tab, int n)
+
+3) On effectue des tests pour des tailles différentes en comparant les résultats entre la méthode V1 et V2 :
+
+Taille  |    V1    |   V2   
+------------------------------
+    2   | 0.000010 | 0.000001
+------------------------------
+    5   | 0.000012 | 0.000004
+------------------------------
+    10  | 0.000015 | 0.000009
+------------------------------
+   100  | 0.000452 | 0.000793
+------------------------------
+  1000  | 4.345551 | 7.806041
+
+Les temps sont affichés en secondes.
+On remarque que pour les tableaux de petites tailles, la méthode V2 est plus efficace tandis que pour les tableaux de taille plus importantes, la méthode
+V1 est plus intéressante pour les calculs.
+
+4) 
