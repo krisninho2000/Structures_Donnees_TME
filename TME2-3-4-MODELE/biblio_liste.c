@@ -60,6 +60,12 @@ void insere(Biblio *B, int num, char *titre, char *artiste)
 
 void libere_biblio(Biblio *B)
 {
+    CellMorceau *curr = B->L;
+    while (curr) {
+        CellMorceau *tmp = curr;
+        curr = curr->suiv;
+        free(tmp);
+    }
     free(B);
 }
 
@@ -172,6 +178,7 @@ int supprimeMorceau(Biblio *B, int num)
 
 	if (num == 0) {
 		B->L = B->L->suiv;
+        B->nE--;
 		return 1;
 	}
 

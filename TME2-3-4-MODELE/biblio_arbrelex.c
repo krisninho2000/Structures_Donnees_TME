@@ -8,10 +8,29 @@ Biblio *nouvelle_biblio(void)
    return B;
 }
 
+// Fonctions pour "libere_biblio"
+
+void libere_noeud(Noeud *N) {
+	if (N == NULL) return;
+
+	CellMorceau *curr = N->liste_morceaux;
+	while (curr) {
+		CellMorceau *tmp = curr;
+		curr = curr->suiv;
+		free(tmp);
+	}
+
+	libere_noeud(N->car_suiv);
+	libere_noeud(N->liste_car);
+}
+
 void libere_biblio(Biblio *B)
 {
+	libere_noeud(B->A);
     free(B);
 }
+
+// Fin des fonctions pour "libere_biblio"
 
 // Recherche si un artiste est présent
 void recherche_artiste(Biblio *B, char *artiste) {
