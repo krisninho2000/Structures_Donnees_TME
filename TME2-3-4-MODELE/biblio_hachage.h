@@ -7,7 +7,6 @@
 #define TAILLE_TABLE 60000
 #define A 0.6180339887498949
 
-
 typedef struct CellMorceau {
     struct CellMorceau *suiv;
     int num;
