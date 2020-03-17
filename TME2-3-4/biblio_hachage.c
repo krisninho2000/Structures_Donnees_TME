@@ -55,15 +55,15 @@ void insere(Biblio *B, int num, char *titre, char *artiste)
 	c->titre = strdup(titre);
 	c->suiv = NULL;
 
-	if (B->T[hach] == NULL) {
-		B->T[hach] = c;
-	}
-	else {
+	if (B->T[hach]) {
 		CellMorceau *curr = B->T[hach];
-		while (curr->suiv != NULL) {
+		while (curr->suiv) {
 			curr = curr->suiv;
 		}
 		curr->suiv = c;
+	}
+	else {
+		B->T[hach] = c;
 	}
 
     B->nE++;

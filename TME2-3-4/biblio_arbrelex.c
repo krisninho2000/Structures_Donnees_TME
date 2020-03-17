@@ -64,6 +64,50 @@ void recherche_artiste(Biblio *B, char *artiste) {
 	}
 }
 
+// Fonctions prises du travail d'un camarade de classe
+
+CellMorceau *nouvelle_cellule(int num, char *titre, char *artiste) {
+	CellMorceau *ncell = (CellMorceau *)malloc(sizeof(CellMorceau));
+	ncell->num = num;
+	ncell->artiste = strdup(artiste);
+	ncell->titre = strdup(titre);
+	ncell->suiv = NULL;
+	return ncell;
+}
+
+Noeud *insere_noeud(Noeud *nd, char *artiste, int i, CellMorceau *ncell) {
+	if (nd == NULL) {
+		nd = (Noeud *)malloc(sizeof(Noeud));
+		nd->liste_car = NULL;
+		nd->car_suiv = NULL;
+		nd->liste_morceaux = NULL;
+		nd->car = artiste[i];
+	}
+
+	if (artiste[i+1] == '\0') {
+		ncell->suiv = nd->liste_morceaux;
+		nd->liste_morceaux = ncell;
+	}
+	else {
+		if (artiste[i] == nd->car) {
+			nd->car_suiv = insere_noeud(nd->car_suiv, artiste, i+1, ncell);
+		}
+		else {
+			nd->liste_car = insere_noeud(nd->liste_car, artiste, i, ncell);
+		}
+	}
+
+	return nd;
+}
+
+void insere(Biblio *B, int num, char *titre, char *artiste) {
+	CellMorceau *ncell = nouvelle_cellule(num, titre, artiste);
+	B->A = insere_noeud(B->A, artiste, 0, ncell);
+}
+
+// Fin des fonctions empruntées
+
+/*
 void insere(Biblio *B, int num, char *titre, char *artiste)
 {
     int i = 0; // Indice lisant nom
@@ -86,9 +130,12 @@ void insere(Biblio *B, int num, char *titre, char *artiste)
 		if (cour->car == artiste[i]) { // On a lu le bon caractere
 			cour = cour->car_suiv;
 			i++;
+
+			if (artiste[2] == 'w' && artiste[0] == 'H' && cour != NULL) printf("%c (cour) - %c (prec)\n", cour->car, prec->car);
 		}
 		else { // On tente un caractere alternatif
 			cour = cour->liste_car;
+			if (artiste[2] == 'w' && artiste[0] == 'H' && cour != NULL) printf("%c (cour) - %c (prec)\n", cour->car, prec->car);
 		}
 	}
 
@@ -100,6 +147,7 @@ void insere(Biblio *B, int num, char *titre, char *artiste)
 		morc->suiv = NULL;
 		
 		CellMorceau *tete = prec->liste_morceaux;
+
 		if (tete != NULL) {
 			while (tete->suiv != NULL) {
 				tete = tete->suiv;
@@ -132,6 +180,7 @@ void insere(Biblio *B, int num, char *titre, char *artiste)
 
 	return;
 }
+*/
 
 void afficheMorceau(CellMorceau *cell)
 {
@@ -161,13 +210,11 @@ void affiche(Biblio *B)
 // Fonction servants à la fonction 'uniques'
 
 int compte_nombre_morceaux(CellMorceau *C) {
-	char *titre = strdup(C->titre);
-	char *artiste = strdup(C->artiste);
 	int it = 0;
 
 	CellMorceau *curr = C;
 	while (curr) {
-		if (strcmp(titre, curr->titre) == 0) it++;
+		if (strcmp(C->titre, curr->titre) == 0) it++;
 		curr = curr->suiv;
 	}
 
@@ -175,56 +222,58 @@ int compte_nombre_morceaux(CellMorceau *C) {
 }
 
 void cherche_uniques(Noeud *N, Biblio *B) {
-	if (N == NULL) return;
+	if (N) {
+		CellMorceau *c = N->liste_morceaux;
+		while (c) {
+			if (compte_nombre_morceaux(c) == 1) insere(B, c->num, strdup(c->titre), strdup(c->artiste));
+			c = c->suiv;
+		}
 
-	CellMorceau *c = N->liste_morceaux;
-	while (c) {
-		if (compte_nombre_morceaux(c) == 1) insere(B, c->num, strdup(c->titre), strdup(c->artiste));
-		c = c->suiv;
+		cherche_uniques(N->liste_car, B);
+		cherche_uniques(N->car_suiv, B);
 	}
-
-	cherche_uniques(N->liste_car, B);
-	cherche_uniques(N->car_suiv, B);
 }
 
 Biblio *uniques (Biblio *B)
 {
-	Biblio *RB = nouvelle_biblio();
-	cherche_uniques(B->A, RB);
-	return RB;
+	Biblio *nB = nouvelle_biblio();
+	cherche_uniques(B->A, nB);
+	return nB;
 }
 
 // Fin des fonctions servant à la fonction 'uniques'
 
-
+CellMorceau *choixMorceau(CellMorceau *c1, CellMorceau *c2) {
+	if (c1 == NULL && c2 == NULL) return NULL;
+	else if (c1 == NULL && c2 != NULL) return c2;
+	else if (c1 != NULL && c2 == NULL) return c1;
+	else return c1;
+}
 
 // Fonctions servant à la fonction 'rechercheParNum'
 
-void cherche_num(Noeud *N, CellMorceau *C, int num) {
-	if ((N == NULL) || (C->titre != NULL)) return;
+CellMorceau *cherche_num(Noeud *N, int num) {
+	if (N == NULL) return NULL;
 
 	CellMorceau *curr = N->liste_morceaux;
 	while (curr) {
 		if (curr->num == num) {
-			C->num = num;
+			CellMorceau *C = (CellMorceau *)malloc(sizeof(CellMorceau));
+			C->num = curr->num;
 			C->titre = strdup(curr->titre);
 			C->artiste = strdup(curr->artiste);
 			C->suiv = NULL;
-			return;
+			return C;
 		}
 		curr = curr->suiv;
 	}
 
-	cherche_num(N->liste_car, C, num);
-	cherche_num(N->car_suiv, C, num);
+	return choixMorceau(cherche_num(N->liste_car, num), cherche_num(N->car_suiv, num));
 }
 
 CellMorceau *rechercheParNum(Biblio *B, int num)
 {
-	CellMorceau *C = (CellMorceau *)malloc(sizeof(CellMorceau));
-	cherche_num(B->A, C, num);
-	if (C->titre != NULL) return C;
-	else return NULL;
+	return cherche_num(B->A, num);
 }
 
 // Fin des fonctions servant à la fonction 'rechercheParNum'
@@ -234,31 +283,28 @@ CellMorceau *rechercheParNum(Biblio *B, int num)
 
 // Fonctions servant à la fonction rechercheParTitre
 
-void cherche_titre(Noeud *N, CellMorceau *C, char *titre) {
-	if ((N == NULL) || (C->titre != NULL)) return;
+CellMorceau *cherche_titre(Noeud *N, char *titre) {
+	if (N == NULL) return NULL;
 
 	CellMorceau *curr = N->liste_morceaux;
 	while (curr) {
 		if (strcmp(curr->titre, titre) == 0) {
+			CellMorceau *C = (CellMorceau *)malloc(sizeof(CellMorceau));
 			C->num = curr->num;
 			C->titre = strdup(curr->titre);
 			C->artiste = strdup(curr->artiste);
 			C->suiv = NULL;
-			return;
+			return C;
 		}
 		curr = curr->suiv;
 	}
 
-	cherche_titre(N->liste_car, C, titre);
-	cherche_titre(N->car_suiv, C, titre);
+	return choixMorceau(cherche_titre(N->liste_car, titre), cherche_titre(N->car_suiv, titre));
 }
 
 CellMorceau *rechercheParTitre(Biblio *B, char * titre)
 {
-	CellMorceau *C = (CellMorceau *)malloc(sizeof(CellMorceau));
-	cherche_titre(B->A, C, titre);
-	if (C->titre != NULL) return C;
-	else return NULL;
+	return cherche_titre(B->A, titre);
 }
 
 // Fin des fonctions servant à la fonction rechercheParTitre

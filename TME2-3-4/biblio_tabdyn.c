@@ -52,7 +52,7 @@ void insere(Biblio *B, int num, char *titre, char *artiste)
 
 void afficheMorceau(CellMorceau *cell)
 {
-	printf("*T* %8d * %-32.32s * %-32.32s *T*\n", cell->num, cell->titre, cell->artiste);
+	if (cell->artiste != NULL) printf("*T* %8d * %-32.32s * %-32.32s *T*\n", cell->num, cell->titre, cell->artiste);
 }
 
 void affiche(Biblio *B)

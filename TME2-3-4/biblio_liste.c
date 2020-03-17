@@ -94,7 +94,7 @@ int compte_nombre_morceaux_bibli(CellMorceau *c, Biblio *B)
     CellMorceau *curr = B->L;
 
     while (curr) {
-        if ((strcmp(strdup(curr->titre), strdup(titre)) == 0) && (strcmp(strdup(curr->artiste), strdup(artiste)) == 0)) {
+        if ((strcmp((curr->titre), (titre)) == 0) && (strcmp((curr->artiste), (artiste)) == 0)) {
             occ++;
         }
         curr = curr->suiv;
@@ -109,7 +109,7 @@ Biblio *uniques (Biblio *B)
     CellMorceau *curr = B->L;
 
     while (curr) {
-        if (compte_nombre_morceaux_bibli(curr, B) == 1) insere(b, b->nE, strdup(curr->titre), strdup(curr->artiste));
+        if (compte_nombre_morceaux_bibli(curr, B) == 1) insere(b, b->nE, (curr->titre), (curr->artiste));
         curr = curr->suiv;
     }
 
@@ -168,7 +168,7 @@ Biblio *extraireMorceauxDe(Biblio *B, char * artiste)
 
 void insereSansNum(Biblio *B, char *titre, char *artiste)
 {
-	insere(B, B->nE, strdup(titre), strdup(artiste));
+	insere(B, B->nE, titre, artiste);
 }
 
 int supprimeMorceau(Biblio *B, int num)
