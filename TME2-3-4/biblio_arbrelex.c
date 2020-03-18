@@ -1,4 +1,5 @@
 #include "biblio_arbrelex.h"
+#include "stdlib.h"
 
 Biblio *nouvelle_biblio(void) 
 {
@@ -103,6 +104,7 @@ Noeud *insere_noeud(Noeud *nd, char *artiste, int i, CellMorceau *ncell) {
 void insere(Biblio *B, int num, char *titre, char *artiste) {
 	CellMorceau *ncell = nouvelle_cellule(num, titre, artiste);
 	B->A = insere_noeud(B->A, artiste, 0, ncell);
+	B->nE++;
 }
 
 // Fin des fonctions empruntées
@@ -343,7 +345,7 @@ Biblio *extraireMorceauxDe(Biblio *B, char * artiste)
 		printf("L'artiste n'a pas pu etre trouvé dans la base de données.\n");
 	}
 
-	return B;
+	return rB;
 }
 
 
@@ -355,39 +357,47 @@ void insereSansNum(Biblio *B, char *titre, char *artiste)
 
 // Fonctions servant à la fonction 'supprimeMorceau'
 
-void supprime_num(Noeud *N, int num, int *r) {
-	if (N == NULL) return;
+int maxi(int a, int b) {
+	if (a > b) return a;
+	else if (b > a) return b;
+	else return a;
+}
+
+int supprime_num(Biblio *B, Noeud *N, int num) {
+	if (N == NULL) return 0;
 
 	CellMorceau *curr = N->liste_morceaux;
-	if (curr->num == num) {
-		N->liste_morceaux = curr->suiv;
-		free(curr);
-		*r = 1;
-	}
-	else {
-		while (curr->suiv->num != num) {
+	if (curr) {
+		if (curr->num == num) {
+			N->liste_morceaux = curr->suiv;
+			free(curr->titre);
+			free(curr->artiste);
+			free(curr);
+			B->nE--;
+			return 1;
+		}
+
+		while (curr->suiv && curr->suiv->num != num) {
 			curr = curr->suiv;
 		}
 
-		CellMorceau *tmp = curr->suiv; 
-		if (tmp != NULL && tmp->num == num) {
+		if (curr->suiv != NULL) {
+			CellMorceau *tmp = curr->suiv;
 			curr->suiv = tmp->suiv;
+			free(tmp->titre);
+			free(tmp->artiste);
 			free(tmp);
-			*r = 1;
+			B->nE--;
+			return 1;
 		}
 	}
 
-	supprime_num(N->liste_car, num, r);
-	supprime_num(N->car_suiv, num, r);
+	return maxi(supprime_num(B, N->liste_car, num), supprime_num(B, N->car_suiv, num));
 }
 
 int supprimeMorceau(Biblio *B, int num)
 {
-	int r = 0;
-	supprime_num(B->A, num, &r);
-	if (r == 1) B->nE++;
-
-	return r; // Si r est égal à 1, alors la suppression a eu lieu. Sinon, il n y a pas eu de suppression
+	return supprime_num(B, B->A, num);
 }
 
 // Fin des fonctions servant à la fonction 'supprimeMorceau'

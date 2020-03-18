@@ -13,6 +13,10 @@ void menu()
 	printf("1-Affichage\n");
 	printf("2-Recherche morceaux uniques\n");
 	printf("3-Recherche morceau par titre\n");
+	printf("4-Recherche morceau par numero\n");
+	printf("5-Recherche morceau par artiste\n");
+	printf("6-Ajouter morceau\n");
+	printf("7-Suppression morceau\n");
 	printf("Votre choix : ");
 }
 
@@ -183,11 +187,14 @@ int main(int argc, const char *argv[])
 	const char *nomfic = argv[1];
 	int nlignes = atoi(argv[2]);
 	char titre[249];
+	char artiste[249];
+	int num;
 	printf("Lecture :\n");
 	Biblio *biblio = charge_n_entrees(nomfic, nlignes);
 	
 	int ch;
 	do {
+		printf("\n");
 		menu();
 		int lus = scanf("%d", &ch);
 		if (lus == 0)
@@ -195,9 +202,11 @@ int main(int argc, const char *argv[])
 		
 		switch(ch) {
 			case 1 :
-				printf("Affichage\n");
-				affiche(biblio);
-				break;
+				{
+					printf("Affichage\n");
+					affiche(biblio);
+					break;
+				}
 			case 2:
 				{
 					Biblio *Bunique = uniques(biblio);
@@ -212,6 +221,43 @@ int main(int argc, const char *argv[])
 					CellMorceau * r = rechercheParTitre(biblio, titre);
 					if (r == NULL) printf("Aucun morceau de titre : %s!!!\n", titre);
 					else afficheMorceau(r);
+					break;
+				}
+			case 4 :
+				{
+					printf("Saisir le numero du morceau :\n");
+					scanf("%d[^\n]", &num);
+					CellMorceau * r = rechercheParNum(biblio, num);
+					if (r == NULL) printf("Aucun morceau de numero : %d !!!\n", num);
+					else afficheMorceau(r);
+					break;
+				}
+			case 5 :
+				{
+					printf("Saisir le nom de l'artiste :\n");
+					scanf(" %248[^\n]", artiste);
+					Biblio * r = extraireMorceauxDe(biblio, artiste);
+					affiche(r);
+					libere_biblio(r);
+					break;
+				}
+			case 6 :
+				{
+					printf("Saisir le titre du morceau :\n");
+					scanf(" %248[^\n]", titre);
+					printf("Saisir le nom de l'artiste :\n");
+					scanf(" %248[^\n]", artiste);
+					insereSansNum(biblio, titre, artiste);
+					printf("Insertion effectué.\n");
+					break;
+				}
+			case 7 :
+				{
+					printf("Saisir le numero du morceau :\n");
+					scanf("%d[^\n]", &num);
+					int i = supprimeMorceau(biblio, num);
+					if (i == 1) printf("Le morceau a été supprimé.\n");
+					else printf("Le morceau n'a pas pu etre supprimé.\n");
 					break;
 				}
 			default :

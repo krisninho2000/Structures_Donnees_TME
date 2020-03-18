@@ -53,18 +53,8 @@ void insere(Biblio *B, int num, char *titre, char *artiste)
 	c->cle = key;
 	c->artiste = strdup(artiste);
 	c->titre = strdup(titre);
-	c->suiv = NULL;
-
-	if (B->T[hach]) {
-		CellMorceau *curr = B->T[hach];
-		while (curr->suiv) {
-			curr = curr->suiv;
-		}
-		curr->suiv = c;
-	}
-	else {
-		B->T[hach] = c;
-	}
+	c->suiv = B->T[hach];
+	B->T[hach] = c;
 
     B->nE++;
 }
@@ -87,34 +77,29 @@ void affiche(Biblio *B)
 	printf("\nNombre de morceaux - %d\n", B->nE);
 }
 
-// Fonctions servant à la fonction "uniques"
-
-int nb_occurences(CellMorceau *list, char *titre, char *artiste) {
-	int occ = 0;
-	while (list) {
-		if ((strcmp(artiste, list->artiste) == 0) && (strcmp(titre, list->titre) == 0)) occ++;
-		list = list->suiv;
-	}
-	return occ;
-}
-
 Biblio *uniques (Biblio *B)
 {
 	Biblio *nB = nouvelle_biblio();
 
-    int i;
+    unsigned int i;
 	for (i = 0; i < B->m; i++) {
 		CellMorceau *curr = B->T[i];
-		while (curr) {
-			if (nb_occurences(B->T[i], curr->titre, curr->artiste) == 1) insere(nB, curr->num, curr->titre, curr->artiste);
-			curr = curr->suiv;
+		if (curr) {
+			while (curr) {
+				int occ = 0;
+				CellMorceau *alt = B->T[i];
+				while (alt) {
+					if ((strcmp(alt->titre, curr->titre) == 0) && (strcmp(alt->artiste, curr->artiste) == 0)) occ++;
+					alt = alt->suiv;
+				}
+				if (occ == 1) insere(nB, nB->nE, curr->titre, curr->artiste);
+				curr = curr->suiv;
+			}
 		}
 	}
 
 	return nB;
 }
-
-// Fin des fonctions servant à "uniques"
 
 CellMorceau *rechercheParNum(Biblio *B, int num)
 {
@@ -123,14 +108,7 @@ CellMorceau *rechercheParNum(Biblio *B, int num)
 		CellMorceau *curr = B->T[i];
 		while (curr) {
 			if (curr->num == num) {
-				CellMorceau *c = (CellMorceau *)malloc(sizeof(CellMorceau));
-				c->num = curr->num;
-				c->cle = curr->cle;
-				c->titre = curr->titre;
-				c->artiste = curr->artiste;
-				c->suiv = NULL;
-
-				return c;
+				return curr;
 			}
 			curr = curr->suiv;
 		}
@@ -148,12 +126,7 @@ CellMorceau *rechercheParTitre(Biblio *B, char * titre)
 			if (strcmp(titre, curr->titre) == 0) {
 				CellMorceau *c = (CellMorceau *)malloc(sizeof(CellMorceau));
 				c->num = curr->num;
-				c->cle = curr->cle;
-				c->titre = curr->titre;
-				c->artiste = curr->artiste;
-				c->suiv = NULL;
-
-				return c;
+				return curr;
 			}
 			curr = curr->suiv;
 		}
@@ -167,8 +140,10 @@ Biblio *extraireMorceauxDe(Biblio *B, char * artiste)
 {
 	Biblio *nB = nouvelle_biblio();
 
-	int keyF = fonction_cle(artiste);
-	CellMorceau *curr = B->T[keyF];
+	unsigned int keyF = fonction_cle(artiste);
+	unsigned int hash = fonction_hachage(keyF, B->m);
+
+	CellMorceau *curr = B->T[hash];
 	while (curr) {
 		insere(nB, curr->num, curr->titre, curr->artiste);
 		curr = curr->suiv;
@@ -188,63 +163,34 @@ int supprimeMorceau(Biblio *B, int num)
 	int i;
 	for (i = 0; i < B->m; i++) {
 		CellMorceau *curr = B->T[i];
-		if (curr->num == num) {
-			CellMorceau *tmp = curr;
-			B->T[i] = tmp->suiv;
-			free(tmp);
-			return 1;
-		}
-		else {
-			CellMorceau *tmp;
-			while (curr && curr->num != num) {
-				tmp = curr;
+		
+		if (curr) {
+			if (curr->num == num) {
+				B->T[i] = curr->suiv;
+				free(curr->titre);
+				free(curr->artiste);
+				free(curr);
+				B->nE--;
+				return 1;
+			}
+
+			while (curr->suiv && curr->suiv->num != num) {
 				curr = curr->suiv;
 			}
-			if (curr->num == num) {
-				tmp->suiv = curr->suiv->suiv;
-				free(curr);
+
+			if (curr->suiv != NULL) {
+				CellMorceau *tmp = curr->suiv;
+				curr->suiv = tmp->suiv;
+				free(tmp->titre);
+				free(tmp->artiste);
+				free(tmp);
+				B->nE--;
 				return 1;
 			}
 		}
-		
 	}
 
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
