@@ -1,22 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "biblio.h"
+#include "biblio_liste.h"
 #include "parser.h"
 #include "string.h"
-
-// DEFINTION DES STRUCTURES
-
-typedef struct CellMorceau {
-    struct CellMorceau *suiv;
-    int num;
-    char *titre;
-    char *artiste;
-} CellMorceau;
-
-struct Biblio {
-    CellMorceau *L; // Liste des morceaux
-    int nE; // Nombre de morceaux dans la liste
-};
 
 // FONCTIONS GENERALES (CREATION, MODIFICATION, AFFICHAGE)
 
@@ -86,7 +72,8 @@ void affiche(Biblio *B)
     printf("Nombre de morceaux dans la bibliotheque - %d\n\n", B->nE);
 }
 
-int compte_nombre_morceaux_bibli(CellMorceau *c, Biblio *B) 
+// Cette fonction permet de compter le nombre de fois qu'un morceau précis dans une bibliothèque (soit au titre et nom de l'artiste similaires)
+int compte_nombre_occurences_bibli(CellMorceau *c, Biblio *B) 
 {
     int occ = 0;
     char *titre = strdup(c->titre);
@@ -109,7 +96,7 @@ Biblio *uniques (Biblio *B)
     CellMorceau *curr = B->L;
 
     while (curr) {
-        if (compte_nombre_morceaux_bibli(curr, B) == 1) insere(b, b->nE, (curr->titre), (curr->artiste));
+        if (compte_nombre_occurences_bibli(curr, B) == 1) insere(b, b->nE, (curr->titre), (curr->artiste));
         curr = curr->suiv;
     }
 

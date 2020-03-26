@@ -2,6 +2,7 @@
 
 // Fonctions de hachage
 
+// Cette fonction permet de convertir le nom de l'artiste en une clé de table de hachage
 int fonction_cle(char *artiste) {
 	int i;
 	int cpt = 0;
@@ -12,6 +13,7 @@ int fonction_cle(char *artiste) {
 	return cpt;
 }
 
+// Cette fonction permet de convertir la valeur d'une clé en indice de table de hachage
 unsigned int fonction_hachage(unsigned int cle, int m) {
 	return floor(m * (cle * A - floor(cle * A)));
 }

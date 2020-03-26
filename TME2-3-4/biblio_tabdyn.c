@@ -67,6 +67,7 @@ void affiche(Biblio *B)
 
 // Fonctions servant à "uniques"
 
+// Cette fonction permet de compter le nombre de fois qu'un morceau précis dans une bibliothèque (soit au titre et nom de l'artiste similaires)
 int compte_occurences(Biblio *B, char *titre, char *artiste) {
    int occ = 0;
    int i;

@@ -357,12 +357,14 @@ void insereSansNum(Biblio *B, char *titre, char *artiste)
 
 // Fonctions servant à la fonction 'supprimeMorceau'
 
+// Cette fonction permet de retourner le maximum entre deux valeurs
 int maxi(int a, int b) {
 	if (a > b) return a;
 	else if (b > a) return b;
 	else return a;
 }
 
+// Cette fonction récursive permet de supprimer un morceau de la bibliothèque grace à son numéro (si ce morceau existe)
 int supprime_num(Biblio *B, Noeud *N, int num) {
 	if (N == NULL) return 0;
 
